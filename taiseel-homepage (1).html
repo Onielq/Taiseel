@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taiseel — Find Property in Kigali</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1a4a2e; --green-mid: #2d6e47; --green-light: #e8f2ec;
+    --terra: #c4622d; --warm: #f2ede4; --text: #1a1a18;
+    --muted: #6b6860; --border: rgba(26,26,24,0.12); --white: #ffffff;
+    --rail: 72px; --nav: 60px;
+    --fd: 'Fraunces', Georgia, serif; --fb: 'DM Sans', system-ui, sans-serif;
+  }
+  body { font-family: var(--fb); background: var(--white); color: var(--text); overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; height: var(--nav);
+    background: var(--white); border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; padding: 0 24px; z-index: 100;
+  }
+  .nl { display: flex; align-items: center; gap: 2px; flex: 1; }
+  .nr { display: flex; align-items: center; gap: 2px; flex: 1; justify-content: flex-end; }
+  a.n {
+    font-size: 14px; font-weight: 500; color: var(--muted);
+    padding: 8px 12px; border-radius: 6px; cursor: pointer;
+    text-decoration: none; white-space: nowrap; transition: color .15s, background .15s;
+  }
+  a.n:hover { color: var(--text); background: var(--warm); }
+  a.n.on { color: var(--green); font-weight: 600; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; flex-shrink: 0; }
+  .bm { width: 34px; height: 34px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .bn { font-family: var(--fd); font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: -.5px; }
+  .bsi {
+    font-family: var(--fb); font-size: 14px; font-weight: 600; color: var(--white);
+    background: var(--green); border: none; border-radius: 8px; padding: 8px 18px;
+    cursor: pointer; margin-left: 4px; transition: background .15s;
+  }
+  .bsi:hover { background: var(--green-mid); }
+
+  /* RAIL */
+  aside {
+    position: fixed; top: var(--nav); left: 0; bottom: 0; width: var(--rail);
+    background: var(--white); border-right: 0.5px solid var(--border);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px 0; gap: 4px; z-index: 90;
+  }
+  .ri {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 8px; border-radius: 10px; cursor: pointer; width: 56px;
+    text-decoration: none; transition: background .15s;
+  }
+  .ri:hover { background: var(--warm); }
+  .ri.on { background: var(--green-light); }
+  .ri.on .rc, .ri.on .rl { color: var(--green); }
+  .rc { font-size: 20px; color: var(--muted); line-height: 1; }
+  .rl { font-size: 10px; font-weight: 500; color: var(--muted); text-align: center; line-height: 1.2; }
+
+  /* MAIN */
+  main { margin-top: var(--nav); margin-left: var(--rail); }
+
+  /* HERO */
+  .hero { position: relative; height: 400px; overflow: hidden; }
+  .hbg { position: absolute; inset: 0; }
+  .hov {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to right, rgba(8,24,14,.75) 0%, rgba(8,24,14,.4) 52%, rgba(8,24,14,.08) 100%);
+  }
+  .hc {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; justify-content: center; padding: 0 52px;
+  }
+  .hh {
+    font-family: var(--fd); font-size: 52px; font-weight: 700;
+    color: white; line-height: 1.05; letter-spacing: -1px; margin-bottom: 26px;
+  }
+  .sb {
+    display: flex; align-items: center; background: white;
+    border-radius: 12px; padding: 5px 5px 5px 18px; gap: 10px;
+    max-width: 560px; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  }
+  .si {
+    flex: 1; border: none; outline: none; font-family: var(--fb);
+    font-size: 15px; color: var(--text); background: transparent;
+  }
+  .si::placeholder { color: #b5b2ab; }
+  .sd { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+  .st {
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    padding: 4px 10px; border-radius: 6px; cursor: pointer;
+    white-space: nowrap; transition: background .15s; user-select: none;
+  }
+  .st:hover { background: var(--warm); }
+  .st.on { color: var(--green); font-weight: 600; }
+  .sbtn {
+    background: var(--terra); border: none; border-radius: 9px;
+    width: 44px; height: 44px; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; flex-shrink: 0; transition: background .15s;
+  }
+  .sbtn:hover { background: #b3561f; }
+
+  /* BELOW */
+  .bw {
+    display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+    padding: 64px 80px 64px 52px; gap: 40px; background: white; min-height: 340px;
+  }
+  .bl h2 {
+    font-family: var(--fd); font-size: 30px; font-weight: 600;
+    color: var(--text); line-height: 1.2; margin-bottom: 8px; letter-spacing: -.3px;
+  }
+  .bl p { font-size: 15px; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+  .bou {
+    font-family: var(--fb); font-size: 14px; font-weight: 600; color: var(--green);
+    background: transparent; border: 1.5px solid var(--green); border-radius: 8px;
+    padding: 10px 24px; cursor: pointer; transition: background .15s, color .15s;
+  }
+  .bou:hover { background: var(--green); color: white; }
+
+  /* CARD STACK */
+  .stk { position: relative; height: 310px; }
+
+  .pc {
+    position: absolute; background: white;
+    border-radius: 14px; box-shadow: 0 2px 18px rgba(0,0,0,.1);
+    overflow: hidden; border: 0.5px solid var(--border);
+  }
+  /* back */
+  .pc:nth-child(2) {
+    width: 295px; right: 30px; top: 28px; z-index: 1;
+    opacity: 0.55; transform: rotate(-2deg) translateY(6px);
+  }
+  /* front */
+  .pc:nth-child(1) { width: 308px; right: 12px; top: 0; z-index: 2; }
+
+  .rl2 {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 13px; border-bottom: 0.5px solid var(--border);
+  }
+  .rdot {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .rdot.g { background: var(--green-light); }
+  .rdot.t { background: #f7ede4; }
+  .rt { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.3; }
+  .rt span { display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
+
+  .ci { width: 100%; height: 148px; overflow: hidden; position: relative; }
+  .ch {
+    position: absolute; top: 10px; right: 10px; width: 28px; height: 28px;
+    background: rgba(255,255,255,.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 13px; z-index: 1;
+  }
+  .cb { padding: 12px 14px; }
+  .cp {
+    font-family: var(--fd); font-size: 20px; font-weight: 700;
+    color: var(--text); letter-spacing: -.3px; margin-bottom: 4px;
+  }
+  .cs { font-size: 12px; color: var(--muted); display: flex; gap: 5px; align-items: center; }
+  .sep { color: #d0cdc8; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nl">
+    <a class="n on" href="#">Buy</a>
+    <a class="n" href="#">Rent</a>
+    <a class="n" href="#">Sell</a>
+    <a class="n" href="#">Get a mortgage</a>
+    <a class="n" href="#">Find an agent</a>
+  </div>
+  <a class="brand" href="#">
+    <div class="bm"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L3 8V18H8V13H12V18H17V8L10 2Z" fill="white"/></svg></div>
+    <span class="bn">Taiseel</span>
+  </a>
+  <div class="nr">
+    <a class="n" href="#">Manage listings</a>
+    <a class="n" href="#">Advertise</a>
+    <a class="n" href="#">Get help</a>
+    <button class="bsi">Sign in</button>
+  </div>
+</nav>
+
+<aside>
+  <a class="ri on" href="#"><span class="rc">⌕</span><span class="rl">Search</span></a>
+  <a class="ri" href="#"><span class="rc">↻</span><span class="rl">Updates</span></a>
+  <a class="ri" href="#"><span class="rc">♡</span><span class="rl">Favorites</span></a>
+  <a class="ri" href="#"><span class="rc">₣</span><span class="rl">Home Loans</span></a>
+  <a class="ri" href="#"><span class="rc">✉</span><span class="rl">Inbox</span></a>
+</aside>
+
+<main>
+
+  <section class="hero">
+    <div class="hbg">
+      <svg width="100%" height="100%" viewBox="0 0 1300 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0d3a23"/><stop offset="100%" stop-color="#1f5c38"/>
+          </linearGradient>
+          <linearGradient id="h1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#164d2e"/><stop offset="100%" stop-color="#0d3320"/>
+          </linearGradient>
+          <linearGradient id="h2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#1a5c36"/><stop offset="100%" stop-color="#12421f"/>
+          </linearGradient>
+        </defs>
+        <rect width="1300" height="400" fill="url(#sky)"/>
+        <ellipse cx="980" cy="130" rx="130" ry="90" fill="#f4b97a" opacity="0.07"/>
+        <ellipse cx="980" cy="130" rx="55" ry="35" fill="#f4b97a" opacity="0.1"/>
+        <path d="M0 230 Q220 150 440 190 Q660 230 880 162 Q1060 112 1300 168 L1300 400 L0 400Z" fill="url(#h2)" opacity="0.62"/>
+        <path d="M0 268 Q165 208 335 244 Q525 284 722 232 Q922 188 1155 252 L1300 268 L1300 400 L0 400Z" fill="url(#h1)"/>
+        <rect x="858" y="206" width="28" height="90" fill="#0d2e1a" opacity="0.62"/>
+        <rect x="896" y="188" width="38" height="108" fill="#0d2e1a" opacity="0.62"/>
+        <rect x="944" y="198" width="24" height="98" fill="#0d2e1a" opacity="0.62"/>
+        <rect x="976" y="218" width="20" height="78" fill="#0d2e1a" opacity="0.62"/>
+        <rect x="1004" y="204" width="34" height="92" fill="#0d2e1a" opacity="0.62"/>
+        <rect x="904" y="198" width="6" height="6" fill="#f4b97a" opacity="0.5"/>
+        <rect x="918" y="198" width="6" height="6" fill="#f4b97a" opacity="0.38"/>
+        <rect x="904" y="214" width="6" height="6" fill="#f4b97a" opacity="0.28"/>
+        <rect x="1012" y="213" width="5" height="5" fill="#f4b97a" opacity="0.42"/>
+        <rect x="864" y="216" width="5" height="5" fill="#f4b97a" opacity="0.48"/>
+        <path d="M0 318 Q325 303 655 313 Q965 323 1300 306 L1300 400 L0 400Z" fill="#0d2218"/>
+        <ellipse cx="88" cy="300" rx="20" ry="24" fill="#1a4a2e"/>
+        <ellipse cx="132" cy="306" rx="15" ry="19" fill="#1f5c38"/>
+        <ellipse cx="170" cy="298" rx="22" ry="26" fill="#164d2e"/>
+        <ellipse cx="1118" cy="296" rx="24" ry="30" fill="#1a4a2e"/>
+        <ellipse cx="1162" cy="303" rx="18" ry="22" fill="#1f5c38"/>
+        <rect x="570" y="256" width="130" height="84" fill="#1a4030" opacity="0.8"/>
+        <polygon points="558,256 712,256 635,218" fill="#142e24" opacity="0.88"/>
+        <rect x="610" y="298" width="50" height="42" fill="#0d2218"/>
+        <rect x="573" y="268" width="30" height="22" fill="#f4b97a" opacity="0.2"/>
+        <rect x="626" y="268" width="30" height="22" fill="#f4b97a" opacity="0.2"/>
+        <!-- people -->
+        <ellipse cx="780" cy="308" rx="9" ry="11" fill="#0a1f12" opacity="0.48"/>
+        <rect x="774" y="319" width="12" height="24" fill="#0a1f12" opacity="0.48"/>
+        <ellipse cx="804" cy="305" rx="8" ry="10" fill="#0a1f12" opacity="0.48"/>
+        <rect x="799" y="315" width="10" height="26" fill="#0a1f12" opacity="0.48"/>
+        <ellipse cx="826" cy="310" rx="7" ry="9" fill="#0a1f12" opacity="0.48"/>
+        <rect x="821" y="319" width="10" height="22" fill="#0a1f12" opacity="0.48"/>
+      </svg>
+    </div>
+    <div class="hov"></div>
+    <div class="hc">
+      <h1 class="hh">Rentals. Homes.<br>Agents. Loans.</h1>
+      <div class="sb">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b5b2ab" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="si" type="text" placeholder="Enter an address, neighbourhood, city, or sector"/>
+        <div class="sd"></div>
+        <span class="st on" onclick="stt(this)">Buy</span>
+        <span class="st" onclick="stt(this)">Rent</span>
+        <span class="st" onclick="stt(this)">Sell</span>
+        <button class="sbtn" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="bw">
+    <div class="bl">
+      <h2>Get home recommendations</h2>
+      <p>Sign in for a more personalised experience.</p>
+      <button class="bou">Sign in</button>
+    </div>
+
+    <div class="stk">
+      <!-- back card -->
+      <div class="pc">
+        <div class="rl2">
+          <div class="rdot t">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4622d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="rt">Recommended homes<span>based on your preferred location</span></div>
+        </div>
+        <div class="ci">
+          <svg width="100%" height="100%" viewBox="0 0 295 148" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="295" height="148" fill="#d8ecd4"/>
+            <path d="M0 86 Q88 60 178 74 Q248 83 295 67 L295 148 L0 148Z" fill="#b8d4b0"/>
+            <rect x="62" y="42" width="170" height="82" fill="#a4c490"/>
+            <polygon points="50,42 240,42 145,13" fill="#84aa70"/>
+            <rect x="110" y="82" width="75" height="48" fill="#6e9458"/>
+            <rect x="67" y="54" width="36" height="26" fill="rgba(255,255,255,0.45)"/>
+            <rect x="193" y="54" width="36" height="26" fill="rgba(255,255,255,0.45)"/>
+          </svg>
+        </div>
+      </div>
+      <!-- front card -->
+      <div class="pc">
+        <div class="rl2">
+          <div class="rdot g">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a4a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <div class="rt">Recommended homes<span>based on your monthly budget</span></div>
+        </div>
+        <div class="ci">
+          <svg width="100%" height="100%" viewBox="0 0 308 148" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="308" height="148" fill="#e2d8c4"/>
+            <rect x="0" y="96" width="308" height="52" fill="#c8bc9a"/>
+            <rect x="42" y="34" width="224" height="90" fill="#d4c8a8"/>
+            <rect x="42" y="34" width="224" height="14" fill="#b8aa80"/>
+            <rect x="58" y="50" width="52" height="44" fill="rgba(255,255,255,0.4)"/>
+            <rect x="122" y="50" width="52" height="44" fill="rgba(255,255,255,0.4)"/>
+            <rect x="198" y="50" width="52" height="44" fill="rgba(255,255,255,0.4)"/>
+            <rect x="128" y="96" width="52" height="30" fill="#b8aa80"/>
+          </svg>
+          <div class="ch" onclick="ht(this)">♡</div>
+        </div>
+        <div class="cb">
+          <div class="cp">RWF 65,000,000</div>
+          <div class="cs">
+            <span>4 bd</span><span class="sep">|</span>
+            <span>3 ba</span><span class="sep">|</span>
+            <span>280 m²</span><span class="sep">|</span>
+            <span>House for Sale</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function stt(el) {
+    document.querySelectorAll('.st').forEach(e => e.classList.remove('on'));
+    el.classList.add('on');
+  }
+  function ht(el) {
+    const s = el.textContent === '♥';
+    el.textContent = s ? '♡' : '♥';
+    el.style.color = s ? '' : '#c4622d';
+  }
+</script>
+
+</body>
+</html>
