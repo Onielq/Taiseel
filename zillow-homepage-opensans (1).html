@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zillow: Real Estate, Apartments, Mortgages & Home Values</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --zillow-blue: #006aff;
+      --zillow-blue-dark: #0053d1;
+      --sidebar-width: 65px;
+      --nav-height: 56px;
+      --text-dark: #1a1a1a;
+      --text-medium: #555555;
+      --text-light: #767676;
+      --border: #d9d9d9;
+      --dropdown-bg: #ffffff;
+      --font: 'Open Sans', Arial, Helvetica, sans-serif;
+    }
+
+    html, body { height: 100%; font-family: var(--font); background: #fff; color: var(--text-dark); }
+
+    /* ─── LEFT SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: calc(var(--nav-height) + 16px);
+      z-index: 200;
+      gap: 0;
+    }
+
+    .sidebar-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 14px 0 10px;
+      cursor: pointer;
+      color: #444;
+      text-decoration: none;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+    .sidebar-item:hover { color: var(--zillow-blue); }
+
+    .sidebar-item svg { width: 22px; height: 22px; }
+
+    .sidebar-item span {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+
+    /* ─── TOP NAVBAR ────────────────────────────────────────── */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      height: var(--nav-height);
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px 0 8px;
+      z-index: 300;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 100%;
+    }
+
+    .nav-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding: 0 13px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-dark);
+      text-decoration: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    .nav-link:hover { color: var(--zillow-blue); }
+    .nav-link.active { color: var(--zillow-blue); }
+
+    .nav-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .nav-center img { height: 26px; width: auto; display: block; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+    }
+
+    .nav-right .nav-link { font-size: 14px; }
+
+    .btn-signin {
+      background: var(--zillow-blue);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 9px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      margin-left: 8px;
+    }
+    .btn-signin:hover { background: var(--zillow-blue-dark); }
+
+    /* ─── DROPDOWN MENUS ────────────────────────────────────── */
+    .has-dropdown { position: relative; }
+
+    .dropdown {
+      display: none;
+      position: fixed;
+      top: var(--nav-height);
+      left: var(--sidebar-width);
+      right: 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+      z-index: 290;
+      padding: 24px 40px 28px;
+    }
+
+    .has-dropdown:hover .dropdown,
+    .dropdown:hover { display: flex; gap: 48px; }
+
+    .dropdown-section { min-width: 200px; }
+
+    .dropdown-section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .dropdown-section ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .dropdown-section ul li a {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--zillow-blue);
+      text-decoration: none;
+      line-height: 1.3;
+    }
+    .dropdown-section ul li a:hover { text-decoration: underline; }
+
+    .dropdown-section p {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-medium);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      max-width: 220px;
+    }
+
+    .dropdown-divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+    }
+
+    /* ─── MAIN CONTENT ──────────────────────────────────────── */
+    .main {
+      margin-left: var(--sidebar-width);
+      padding-top: var(--nav-height);
+      min-height: 100vh;
+    }
+
+    /* ─── HERO SECTION ──────────────────────────────────────── */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 378px;
+      overflow: hidden;
+      background: #2a3a2a;
+    }
+
+    .hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0) 100%);
+    }
+
+    .hero-content {
+      position: absolute;
+      top: 50%;
+      left: 52px;
+      transform: translateY(-50%);
+    }
+
+    .hero-title {
+      color: #fff;
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.3px;
+      margin-bottom: 24px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-radius: 5px;
+      width: 370px;
+      height: 52px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-dark);
+      padding: 0 14px;
+      font-family: var(--font);
+      background: transparent;
+    }
+    .search-bar input::placeholder { color: #999; }
+
+    .search-bar button {
+      width: 52px;
+      height: 52px;
+      background: transparent;
+      border: none;
+      border-left: 1px solid #eee;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
+      transition: background 0.15s;
+    }
+    .search-bar button:hover { background: #f5f5f5; }
+    .search-bar button svg { width: 19px; height: 19px; }
+
+    /* ─── BUYABILITY SECTION ─────────────────────────────────── */
+    .buyability-section {
+      padding: 48px 80px 48px 120px;
+      background: #fff;
+    }
+
+    .buyability-section > h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+    .buyability-section > h2 sup {
+      font-size: 11px;
+      font-weight: 400;
+      vertical-align: super;
+    }
+
+    .buyability-section > p {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-medium);
+      margin-bottom: 24px;
+    }
+
+    .buyability-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    /* Zillow Home Loans calculator card */
+    .loans-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .loans-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .loans-logo svg { width: 18px; height: 18px; }
+
+    .loans-logo span {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .loans-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      margin-bottom: 16px;
+    }
+
+    .loans-stat label {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-light);
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    .loans-stat .val {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .loans-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .loans-row-3 .loans-stat .val { font-size: 15px; }
+
+    .btn-get-started {
+      width: 100%;
+      background: var(--zillow-blue);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-get-started:hover { background: var(--zillow-blue-dark); }
+
+    /* Property cards in BuyAbility row */
+    .buy-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .buy-card-img-wrap {
+      position: relative;
+      height: 148px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .buy-card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .within-badge {
+      position: absolute;
+      top: 0; left: 0;
+      background: #c8590a;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .buy-card-body {
+      padding: 12px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .skeleton {
+      height: 12px;
+      background: #e8e8e8;
+      border-radius: 4px;
+    }
+    .skeleton.short { width: 65%; }
+    .skeleton.medium { width: 85%; }
+
+    /* ─── FEATURE CARDS SECTION ──────────────────────────────── */
+    .feature-section {
+      background: #f5f5f5;
+      padding: 48px 80px 48px calc(var(--sidebar-width) + 80px);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e4e4e4;
+      padding: 40px 32px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .feature-illus {
+      width: 110px;
+      height: 110px;
+      margin-bottom: 20px;
+      object-fit: contain;
+    }
+
+    .feature-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-medium);
+      line-height: 1.6;
+      margin-bottom: 24px;
+      max-width: 280px;
+    }
+
+    .btn-feature {
+      display: inline-block;
+      border: 2px solid var(--text-dark);
+      border-radius: 6px;
+      padding: 9px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: var(--font);
+      color: var(--text-dark);
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .btn-feature:hover { background: var(--text-dark); color: #fff; }
+
+    /* ─── ABOUT RECOMMENDATIONS ──────────────────────────────── */
+    .about-recs {
+      background: #f5f5f5;
+      padding: 28px 80px 48px;
+      text-align: center;
+    }
+    .about-recs h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .about-recs p {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-medium);
+      line-height: 1.6;
+      max-width: 840px;
+      margin: 0 auto;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding-left: var(--sidebar-width);
+    }
+
+    .footer-nav {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 18px 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-nav-item:last-child { border-right: none; }
+    .footer-nav-item:hover { color: var(--zillow-blue); }
+    .footer-nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    .footer-links {
+      padding: 24px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-links-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px 0;
+    }
+
+    .footer-links-row a {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-dark);
+      text-decoration: none;
+      padding: 3px 10px;
+      transition: color 0.15s;
+    }
+    .footer-links-row a:hover { color: var(--zillow-blue); text-decoration: underline; }
+
+    .footer-donotsell {
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--zillow-blue);
+      text-decoration: none;
+      padding: 4px 0;
+    }
+    .footer-donotsell:hover { text-decoration: underline; }
+
+    .footer-legal {
+      padding: 24px 80px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .footer-legal p {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-medium);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .footer-legal a {
+      color: var(--zillow-blue);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 400;
+    }
+    .footer-legal a:hover { text-decoration: underline; }
+
+    .footer-legal .legal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--zillow-blue);
+      display: block;
+      margin-bottom: 10px;
+      text-decoration: none;
+    }
+
+    .footer-bottom {
+      padding: 24px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .app-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .app-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1.5px solid #333;
+      border-radius: 7px;
+      padding: 7px 14px;
+      text-decoration: none;
+      color: var(--text-dark);
+      transition: background 0.15s;
+    }
+    .app-btn:hover { background: #f5f5f5; }
+
+    .app-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .app-btn-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .app-btn-text small { font-size: 10px; font-weight: 400; color: #555; }
+    .app-btn-text strong { font-size: 13px; font-weight: 700; }
+
+    .footer-social {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-social-logo { height: 22px; width: auto; }
+
+    .footer-social span {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-medium);
+    }
+
+    .social-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .social-icon:hover { opacity: 0.8; }
+    .social-icon.fb { background: #1877f2; }
+    .social-icon.ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+    .social-icon.tk { background: #010101; }
+    .social-icon svg { width: 16px; height: 16px; fill: #fff; }
+
+    .footer-copy {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-medium);
+    }
+
+    .equal-housing {
+      width: 28px;
+      height: 28px;
+    }
+
+    /* ─── RECOMMENDATIONS SECTION ────────────────────────────── */
+    .rec-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 80px 60px 120px;
+      background: #fff;
+    }
+
+    .rec-text { max-width: 340px; }
+
+    .rec-text h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .rec-text p {
+      font-size: 14.5px;
+      font-weight: 400;
+      color: var(--text-medium);
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .btn-signin-outline {
+      display: inline-block;
+      border: 2px solid var(--text-dark);
+      border-radius: 4px;
+      padding: 9px 22px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      color: var(--text-dark);
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-signin-outline:hover { background: var(--text-dark); color: #fff; }
+
+    /* ─── PROPERTY CARDS STACK ───────────────────────────────── */
+    .rec-cards {
+      position: relative;
+      width: 340px;
+      height: 280px;
+      flex-shrink: 0;
+    }
+
+    .card-back {
+      position: absolute;
+      top: 30px;
+      right: -12px;
+      width: 300px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .card-front {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      width: 310px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      overflow: hidden;
+      z-index: 3;
+    }
+
+    .card-photo {
+      width: 100%;
+      height: 148px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-info {
+      padding: 12px 14px 14px;
+    }
+
+    .card-price {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 5px;
+    }
+
+    .card-details {
+      font-size: 12.5px;
+      font-weight: 400;
+      color: var(--text-medium);
+    }
+
+    .card-details span { color: var(--text-light); margin: 0 4px; }
+    .card-details .sep { color: #ccc; }
+
+    .rec-badge {
+      position: absolute;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border-radius: 24px;
+      padding: 7px 14px 7px 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+      width: 260px;
+    }
+
+    .rec-badge-1 { top: 0; left: 15px; }
+    .rec-badge-2 { top: 36px; left: 15px; }
+
+    .badge-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .badge-icon.teal { background: #008489; }
+    .badge-icon.orange { background: #e06d00; }
+
+    .badge-icon svg { width: 16px; height: 16px; color: #fff; fill: #fff; }
+
+    .badge-text strong {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1.2;
+    }
+    .badge-text small {
+      font-size: 10.5px;
+      font-weight: 400;
+      color: var(--text-light);
+      line-height: 1.2;
+    }
+
+    /* === BUYABILITY SECTION === */
+    .buyability-section { background:#fff; padding:40px 0 48px; border-top:1px solid #efefef; }
+    .buyability-inner { max-width:1200px; margin:0 auto; padding:0 80px; }
+    .buyability-header { margin-bottom:24px; }
+    .buyability-title { font-size:22px; font-weight:700; color:#1a1a1a; margin-bottom:6px; }
+    .buyability-title sup { font-size:11px; vertical-align:super; }
+    .buyability-sub { font-size:14.5px; font-weight:400; color:#555; }
+    .buyability-grid { display:flex; align-items:flex-start; gap:28px; }
+    .zhl-card { width:390px; flex-shrink:0; border:1px solid #d9d9d9; border-radius:8px; padding:22px 22px 20px; background:#fff; }
+    .zhl-logo-row { display:flex; align-items:center; gap:7px; margin-bottom:20px; }
+    .zhl-brand { font-size:14.5px; font-weight:700; color:#1a1a1a; }
+    .zhl-stats { display:flex; gap:24px; margin-bottom:18px; }
+    .zhl-stats-3 { gap:16px; }
+    .zhl-stat-val { font-size:18px; font-weight:700; color:#1a1a1a; margin-bottom:3px; }
+    .zhl-stat-label { font-size:12px; font-weight:400; color:#767676; }
+    .zhl-stat-label sup { font-size:9px; }
+    .btn-get-started { display:block; width:100%; background:#006aff; color:#fff; border:none; border-radius:5px; padding:14px; font-size:15px; font-weight:700; font-family:var(--font); cursor:pointer; transition:background 0.15s; margin-top:4px; }
+    .btn-get-started:hover { background:#0053d1; }
+    .buyability-cards-wrap { flex:1; overflow:hidden; }
+    .buyability-cards { display:flex; gap:16px; }
+    .ba-card { width:248px; flex-shrink:0; background:#fff; border:1px solid #d9d9d9; border-radius:8px; overflow:hidden; }
+    .ba-card-partial { width:140px; }
+    .ba-card-img-wrap { position:relative; }
+    .ba-card-img { width:100%; height:152px; object-fit:cover; display:block; }
+    .ba-badge { position:absolute; top:0; left:0; background:#c0392b; color:#fff; font-size:11px; font-weight:700; padding:5px 10px; letter-spacing:0.02em; }
+    .ba-card-body { padding:14px 12px; }
+    .skeleton { height:12px; background:#e8e8e8; border-radius:6px; margin-bottom:9px; }
+    .sk-wide { width:100%; }
+    .sk-medium { width:80%; }
+    .sk-narrow { width:60%; }
+    /* === FEATURE CARDS === */
+    .feature-cards-section { background:#f5f5f5; }
+    .feature-cards-inner { display:flex; gap:20px; padding:32px 80px; max-width:1200px; margin:0 auto; box-sizing:border-box; width:100%; }
+    .feature-card { flex:1; background:#fff; border:1px solid #ddd; border-radius:8px; padding:36px 28px 28px; display:flex; flex-direction:column; align-items:center; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+    .fc-illustration { width:120px; height:120px; margin-bottom:20px; display:flex; align-items:center; justify-content:center; }
+    .fc-illustration img { width:100%; height:100%; object-fit:contain; }
+    .fc-title { font-size:19px; font-weight:700; color:#1a1a1a; margin-bottom:12px; }
+    .fc-desc { font-size:14px; font-weight:400; color:#555; line-height:1.6; margin-bottom:24px; flex:1; }
+    .fc-btn { display:inline-block; border:2px solid #1a1a1a; border-radius:4px; padding:9px 20px; font-size:14.5px; font-weight:700; color:#1a1a1a; text-decoration:none; font-family:var(--font); transition:background 0.15s,color 0.15s; white-space:nowrap; }
+    .fc-btn:hover { background:#1a1a1a; color:#fff; }
+    .about-recs { background:#f5f5f5; text-align:center; padding:4px 80px 28px; max-width:1200px; margin:0 auto; box-sizing:border-box; }
+    .about-recs-title { font-size:14px; font-weight:700; color:#1a1a1a; margin-bottom:8px; }
+    .about-recs-text { font-size:13px; font-weight:400; color:#555; line-height:1.6; max-width:900px; margin:0 auto; }
+    /* === FOOTER === */
+    .site-footer { background:#fff; border-top:1px solid #e0e0e0; }
+    .footer-nav { background:#fff; }
+    .footer-nav-inner { display:flex; align-items:center; max-width:1200px; margin:0 auto; padding:0 80px; height:56px; }
+    .footer-nav-item { position:relative; display:flex; align-items:center; height:100%; }
+    .footer-nav-btn { background:none; border:none; font-size:14.5px; font-weight:600; color:#1a1a1a; cursor:pointer; display:flex; align-items:center; gap:6px; padding:0 20px; height:100%; font-family:var(--font); white-space:nowrap; }
+    .footer-nav-btn:hover { color:#006aff; }
+    .footer-nav-dropdown { display:none; position:absolute; top:100%; left:0; background:#fff; border:1px solid #ddd; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.1); list-style:none; padding:8px 0; min-width:200px; z-index:100; }
+    .footer-nav-item:hover .footer-nav-dropdown { display:block; }
+    .footer-nav-dropdown li a { display:block; padding:8px 16px; font-size:13.5px; font-weight:400; color:#006aff; text-decoration:none; }
+    .footer-nav-dropdown li a:hover { background:#f5f5f5; }
+    .footer-nav-sep { width:1px; height:24px; background:#d9d9d9; }
+    .footer-hr { border:none; border-top:1px solid #e0e0e0; margin:0; }
+    .footer-links { padding:20px 80px; max-width:1200px; margin:0 auto; box-sizing:border-box; }
+    .footer-links-row { display:flex; flex-wrap:wrap; justify-content:center; gap:0; margin-bottom:4px; }
+    .footer-links-row a { font-size:13px; font-weight:400; color:#1a1a1a; text-decoration:none; padding:2px 10px; border-right:1px solid #ccc; line-height:1.8; }
+    .footer-links-row a:last-child { border-right:none; }
+    .footer-links-row a:hover { text-decoration:underline; }
+    .footer-link-blue { color:#006aff !important; }
+    .footer-legal { max-width:780px; margin:0 auto; padding:16px 20px 20px; text-align:center; }
+    .footer-legal p { font-size:11.5px; font-weight:400; color:#767676; line-height:1.7; margin-bottom:10px; }
+    .footer-legal a { color:#767676; text-decoration:underline; font-weight:400; }
+    .footer-legal a.footer-link-blue { color:#006aff; }
+    .footer-apps { display:flex; justify-content:center; gap:12px; padding:10px 0 16px; }
+    .app-badge { text-decoration:none; display:block; }
+    .footer-bottom { border-top:1px solid #e0e0e0; padding:12px 0; }
+    .footer-bottom-inner { max-width:1200px; margin:0 auto; padding:0 80px; display:flex; align-items:center; justify-content:space-between; }
+    .footer-bottom-left { display:flex; align-items:center; gap:10px; }
+    .footer-zillow-name { font-size:16px; font-weight:700; color:#006aff; margin-right:4px; }
+    .footer-follow { font-size:13px; font-weight:400; color:#555; margin-left:8px; }
+    .social-icon { text-decoration:none; display:flex; align-items:center; }
+    .footer-bottom-right { display:flex; align-items:center; gap:10px; font-size:12px; font-weight:400; color:#555; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ─── LEFT SIDEBAR ──────────────────────────────────────── -->
+  <aside class="sidebar">
+    <a class="sidebar-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <span>Search</span>
+    </a>
+    <a class="sidebar-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span>Updates</span>
+    </a>
+    <a class="sidebar-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <span>Favorites</span>
+    </a>
+    <a class="sidebar-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Home<br>Loans</span>
+    </a>
+    <a class="sidebar-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+      </svg>
+      <span>Inbox</span>
+    </a>
+  </aside>
+
+  <!-- ─── TOP NAVBAR ────────────────────────────────────────── -->
+  <nav class="top-nav">
+    <div class="nav-left">
+
+      <!-- BUY -->
+      <div class="has-dropdown">
+        <a class="nav-link" href="#">Buy</a>
+        <div class="dropdown">
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Homes for sale</span>
+            <ul>
+              <li><a href="#">Homes for sale</a></li>
+              <li><a href="#">Foreclosures</a></li>
+              <li><a href="#">For sale by owner</a></li>
+              <li><a href="#">Open houses</a></li>
+              <li><a href="#">New construction</a></li>
+              <li><a href="#">Coming soon</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Resources</span>
+            <ul>
+              <li><a href="#">Buyers Guide</a></li>
+              <li><a href="#">Foreclosure center</a></li>
+              <li><a href="#">Real estate app</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- RENT -->
+      <div class="has-dropdown">
+        <a class="nav-link" href="#">Rent</a>
+        <div class="dropdown">
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Moundville rentals</span>
+            <ul>
+              <li><a href="#">Search apartments for rent</a></li>
+              <li><a href="#">Search houses for rent</a></li>
+              <li><a href="#">Search all rental listings</a></li>
+              <li><a href="#">Browse all rental buildings</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Tools for renters</span>
+            <ul>
+              <li><a href="#">Estimate what you can afford</a></li>
+              <li><a href="#">See your applications</a></li>
+              <li><a href="#">Manage your tours</a></li>
+              <li><a href="#">Pay your rent</a></li>
+              <li><a href="#">Build your credit</a></li>
+              <li><a href="#">Get renters insurance</a></li>
+              <li><a href="#">Explore housing voucher programs</a></li>
+              <li><a href="#">Learn more about renting</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SELL -->
+      <div class="has-dropdown">
+        <a class="nav-link" href="#">Sell</a>
+        <div class="dropdown">
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Looking for pros?</span>
+            <ul>
+              <li><a href="#">Real estate agents</a></li>
+              <li><a href="#">Home builders</a></li>
+              <li><a href="#">Property managers</a></li>
+              <li><a href="#">Real estate photographers</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">I'm a pro</span>
+            <ul>
+              <li><a href="#">Agent solutions</a></li>
+              <li><a href="#">Real estate business plan</a></li>
+              <li><a href="#">Agent advertising</a></li>
+              <li><a href="#">Real estate agent scripts</a></li>
+              <li><a href="#">Agent resource center</a></li>
+              <li><a href="#">Listing flyer templates</a></li>
+              <li><a href="#">Create a free agent account</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- GET A MORTGAGE -->
+      <div class="has-dropdown">
+        <a class="nav-link" href="#">Get a mortgage</a>
+        <div class="dropdown">
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Started a loan application?</span>
+            <p>Pick up where you left off on your Zillow Home Loans dashboard.</p>
+            <ul>
+              <li><a href="#">Home loans dashboard</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Your mortgage</span>
+            <ul>
+              <li><a href="#">Discover Zillow Home Loans</a></li>
+              <li><a href="#">Calculate your BuyAbility</a></li>
+              <li><a href="#">Get pre-qualified</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Mortgage tools</span>
+            <ul>
+              <li><a href="#">Estimate your mortgage payment</a></li>
+              <li><a href="#">See current mortgage rates</a></li>
+              <li><a href="#">Learn about financing a home</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIND AN AGENT -->
+      <div class="has-dropdown">
+        <a class="nav-link" href="#">Find an agent</a>
+        <div class="dropdown">
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Looking for pros?</span>
+            <ul>
+              <li><a href="#">Real estate agents</a></li>
+              <li><a href="#">Home builders</a></li>
+              <li><a href="#">Property managers</a></li>
+              <li><a href="#">Real estate photographers</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">I'm a pro</span>
+            <ul>
+              <li><a href="#">Agent solutions</a></li>
+              <li><a href="#">Real estate business plan</a></li>
+              <li><a href="#">Agent advertising</a></li>
+              <li><a href="#">Real estate agent scripts</a></li>
+              <li><a href="#">Agent resource center</a></li>
+              <li><a href="#">Listing flyer templates</a></li>
+              <li><a href="#">Create a free agent account</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /nav-left -->
+
+    <!-- CENTER LOGO -->
+    <div class="nav-center">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADOA6UDASIAAhEBAxEB/8QAHQABAAIDAQEBAQAAAAAAAAAAAAYHAwUIBAIBCf/EAFAQAAEDAwIDAgQSCAQFAwUAAAEAAgMEBREGEgcTISIxFDe01AgVFhcjMjVBUVRXdHV2lJWxszM2VnJzsrXTQkNhliRxgZGhJVKSREZVg9H/xAAcAQEAAgIDAQAAAAAAAAAAAAAABgcEBQIDCAH/xABCEQABAwEFAQwHBwUAAgMAAAABAAIDBAUGESExsRITFkFRYXFygZGh0RQiNDVTweEVMjNSYpLwByNCgsKi8bLS4v/aAAwDAQACEQMRAD8A4yRERERERERERERERERERERZqKlqa2sho6OnmqameRsUMMTC98j3HDWtaOpJJAAHera0Lw/t9soqe66khfUXfmiWG3PDTBTsAOPCGkHe8kg8voG7cP3FzmN2Fm2XU2lNvUDcTxniHOSsStroaKPfJThtPQqfRXfqzQdl1BSVFTbY4rVfGsZyGRBkVFUhoILHNAAikcNuHghhLe0AXOkFNXW3XC1Vz6C6UNVQVcYaXwVMTo5GhzQ5pLXAEZaQR8IIK7LVsipsuXe5x0HiPR5LhQWhBXR7uI9I4wvKiItWs5ERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERFtdMaevOpri272SidVTshfPJ22sZHG0dXOe4hrR3DJIyS0DJIB2midEXbUzfDmgUdnjqBBUV8mMNdt3FrGZBleBjst6AuZuLA4FXNQUVps9HJb9P0HgFE8sdKDIZJahzW7Q+V57z3nAAaC521rclSWwbtVFqu3Z9WPjPLzDl2BaW1bahoBuRm/k814tJ6ds+kaKD0uY2pvfLe2quxLsneAHRwNPRjAARvwJHBz8lrXbBsERXDQWfT0EIhgbgPE855VXVXWTVchklOJ/miLyahsln1XT01JqB1SzwZjo6Wtpw0zQAg4aQf0kQcd3LJB79rmbnZ9aLnWUUFbEYZ24tP8y51xpqmWmkEkRwIVGax0jfNKTU7brTs8Hqw91JVQyCSGoa120lrh3HuJY4NeA5pLRuC0C6UkZRVdIbddqCK5218rJZaSZzmtc5p6ODmkOY7BI3NIOCR3Eg1Jr7h9W2RtZebM2Wu09E9nszntM1LvJDWTNGD0OG8wDYS5ntXO2CoLfuvPZhMsfrRcvGOnz0Vh2TbkVcNw/wBV/Jy9HkoMiIoqt8iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIr00To226WoqGuqofCdS5ZVGWRr2C2u25ETWOxmVucvc4dl7QGY2b37SybJntSfeYe08QCwa+0IqGLfJOwcqr7TPDXVF7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" alt="Zillow" />
+    </div>
+
+    <!-- RIGHT LINKS -->
+    <div class="nav-right">
+
+      <!-- MANAGE RENTALS -->
+      <div class="has-dropdown">
+        <a class="nav-link" href="#">Manage rentals</a>
+        <div class="dropdown">
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Management tasks</span>
+            <ul>
+              <li><a href="#">List your property for rent</a></li>
+              <li><a href="#">View your properties</a></li>
+              <li><a href="#">Read your messages</a></li>
+            </ul>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Tools for rental managers</span>
+            <ul>
+              <li><a href="#">Check your property's rental value</a></li>
+              <li><a href="#">Screen renters with applications</a></li>
+              <li><a href="#">Create and manage leases</a></li>
+              <li><a href="#">Collect rent</a></li>
+              <li><a href="#">Learn about renting out your property</a></li>
+              <li><a href="#">Search help center</a></li>
+              <li><a href="#">Explore Zillow Rental Manager</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <a class="nav-link" href="#">Advertise</a>
+      <a class="nav-link" href="#">Get help</a>
+      <button class="btn-signin">Sign in</button>
+    </div>
+  </nav>
+
+  <!-- ─── MAIN CONTENT ──────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- HERO -->
+    <section class="hero">
+      <img
+        class="hero-img"
+        src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1400&q=85&auto=format&fit=crop"
+        alt="Home exterior with real estate agent"
+      />
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h1 class="hero-title">Rentals. Homes.<br>Agents. Loans.</h1>
+        <div class="search-bar">
+          <input type="text" placeholder="Enter an address, neighborhood, city, or ZIP code" />
+          <button aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECOMMENDATIONS -->
+    <section class="rec-section">
+      <div class="rec-text">
+        <h2>Get home recommendations</h2>
+        <p>Sign in for a more personalized experience.</p>
+        <a class="btn-signin-outline" href="#">Sign in</a>
+      </div>
+
+      <div class="rec-cards">
+        <div class="rec-badge rec-badge-1">
+          <div class="badge-icon teal">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+          <div class="badge-text">
+            <strong>Recommended homes</strong>
+            <small>based on your monthly budget</small>
+          </div>
+        </div>
+
+        <div class="rec-badge rec-badge-2">
+          <div class="badge-icon orange">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div class="badge-text">
+            <strong>Recommended homes</strong>
+            <small>based on your preferred location</small>
+          </div>
+        </div>
+
+        <div class="card-back">
+          <img class="card-photo"
+            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80&auto=format&fit=crop"
+            alt="House for sale"
+          />
+          <div class="card-info">
+            <div class="card-price">$95,000</div>
+            <div class="card-details">4 bd <span>|</span> 3 ba <span>|</span> 3,102 sqft <span>|</span> House for Sale</div>
+          </div>
+        </div>
+
+        <div class="card-front">
+          <img class="card-photo"
+            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=80&auto=format&fit=crop"
+            alt="House for sale"
+          />
+          <div class="card-info">
+            <div class="card-price">$95,000</div>
+            <div class="card-details">4 bd <span>|</span> 3 ba <span>|</span> 3,102 sqft <span>|</span> House for Sale</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUYABILITY SECTION -->
+    <section class="buyability-section">
+      <h2>Find homes you can afford with BuyAbility<sup>℠</sup></h2>
+      <p>Answer a few questions. We'll highlight homes you're likely to qualify for.</p>
+      <div class="buyability-grid">
+        <div class="loans-card">
+          <div class="loans-logo">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" fill="#006aff"/>
+              <polyline points="9 22 9 12 15 12 15 22" fill="#fff" stroke="#006aff" stroke-width="0.5"/>
+            </svg>
+            <span>Zillow Home Loans</span>
+          </div>
+          <div class="loans-row">
+            <div class="loans-stat">
+              <div class="val">$ --</div>
+              <label>Suggested target price</label>
+            </div>
+            <div class="loans-stat">
+              <div class="val">$ --</div>
+              <label>BuyAbility<sup style="font-size:9px">℠</sup></label>
+            </div>
+          </div>
+          <div class="loans-row-3">
+            <div class="loans-stat">
+              <div class="val">$ --</div>
+              <label>Mo. payment</label>
+            </div>
+            <div class="loans-stat">
+              <div class="val">-- %</div>
+              <label>Today's rate</label>
+            </div>
+            <div class="loans-stat">
+              <div class="val">-- %</div>
+              <label>APR</label>
+            </div>
+          </div>
+          <button class="btn-get-started">Let's get started</button>
+        </div>
+        <div class="buy-card">
+          <div class="buy-card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=500&q=80&auto=format&fit=crop" alt="House" />
+            <div class="within-badge">Within BuyAbility</div>
+          </div>
+          <div class="buy-card-body">
+            <div class="skeleton medium"></div>
+            <div class="skeleton short"></div>
+            <div class="skeleton medium"></div>
+          </div>
+        </div>
+        <div class="buy-card">
+          <div class="buy-card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500&q=80&auto=format&fit=crop" alt="House" />
+            <div class="within-badge">Within BuyAbility</div>
+          </div>
+          <div class="buy-card-body">
+            <div class="skeleton medium"></div>
+            <div class="skeleton short"></div>
+            <div class="skeleton medium"></div>
+          </div>
+        </div>
+        <div class="buy-card" style="overflow:hidden">
+          <div class="buy-card-img-wrap">
+            <img src="https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=500&q=80&auto=format&fit=crop" alt="House" />
+            <div class="within-badge">Within BuyAbility</div>
+          </div>
+          <div class="buy-card-body">
+            <div class="skeleton medium"></div>
+            <div class="skeleton short"></div>
+            <div class="skeleton medium"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUYABILITY SECTION (v2) -->
+    <section class="buyability-section">
+      <div class="buyability-inner">
+        <div class="buyability-header">
+          <h2 class="buyability-title">Find homes you can afford with BuyAbility<sup>SM</sup></h2>
+          <p class="buyability-sub">Answer a few questions. We&rsquo;ll highlight homes you&rsquo;re likely to qualify for.</p>
+        </div>
+        <div class="buyability-grid">
+          <div class="zhl-card">
+            <div class="zhl-logo-row">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#006aff"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              <span class="zhl-brand">Zillow Home Loans</span>
+            </div>
+            <div class="zhl-stats">
+              <div class="zhl-stat-item"><div class="zhl-stat-val">$ --</div><div class="zhl-stat-label">Suggested target price</div></div>
+              <div class="zhl-stat-item"><div class="zhl-stat-val">$ --</div><div class="zhl-stat-label">BuyAbility<sup>SM</sup></div></div>
+            </div>
+            <div class="zhl-stats zhl-stats-3">
+              <div class="zhl-stat-item"><div class="zhl-stat-val">$ --</div><div class="zhl-stat-label">Mo. payment</div></div>
+              <div class="zhl-stat-item"><div class="zhl-stat-val">-- %</div><div class="zhl-stat-label">Today&rsquo;s rate</div></div>
+              <div class="zhl-stat-item"><div class="zhl-stat-val">-- %</div><div class="zhl-stat-label">APR</div></div>
+            </div>
+            <button class="btn-get-started">Let&rsquo;s get started</button>
+          </div>
+          <div class="buyability-cards-wrap">
+            <div class="buyability-cards">
+              <div class="ba-card">
+                <div class="ba-card-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80&auto=format&fit=crop" alt="Home" class="ba-card-img"/>
+                  <div class="ba-badge">Within BuyAbility</div>
+                </div>
+                <div class="ba-card-body"><div class="skeleton sk-wide"></div><div class="skeleton sk-medium"></div><div class="skeleton sk-narrow"></div></div>
+              </div>
+              <div class="ba-card">
+                <div class="ba-card-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1605276373954-0c4a0dac5b12?w=400&q=80&auto=format&fit=crop" alt="Home" class="ba-card-img"/>
+                  <div class="ba-badge">Within BuyAbility</div>
+                </div>
+                <div class="ba-card-body"><div class="skeleton sk-wide"></div><div class="skeleton sk-medium"></div><div class="skeleton sk-narrow"></div></div>
+              </div>
+              <div class="ba-card ba-card-partial">
+                <div class="ba-card-img-wrap">
+                  <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&q=80&auto=format&fit=crop" alt="Home" class="ba-card-img"/>
+                  <div class="ba-badge">Within BuyAbility</div>
+                </div>
+                <div class="ba-card-body"><div class="skeleton sk-wide"></div><div class="skeleton sk-medium"></div><div class="skeleton sk-narrow"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUY / RENT / SELL CARDS -->
+    <section class="feature-cards-section">
+      <div class="feature-cards-inner">
+        <div class="feature-card">
+          <div class="fc-illustration">
+            <svg viewBox="0 0 140 140" width="120" height="120" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="60" fill="#FFF3E0"/><rect x="45" y="55" width="50" height="38" rx="4" fill="#1565C0"/><polygon points="40,58 70,38 100,58" fill="#1976D2"/><rect x="60" y="72" width="20" height="21" rx="2" fill="#fff"/><circle cx="52" cy="87" r="11" fill="#4CAF50"/><line x1="46" y1="87" x2="58" y2="87" stroke="#fff" stroke-width="2.5"/><line x1="52" y1="81" x2="52" y2="93" stroke="#fff" stroke-width="2.5"/><circle cx="90" cy="78" r="9" fill="#FFF9C4" stroke="#F9A825" stroke-width="1.5"/></svg>
+          </div>
+          <h3 class="fc-title">Buy a home</h3>
+          <p class="fc-desc">A real estate agent can provide you with a clear breakdown of costs so that you can avoid surprise expenses.</p>
+          <a class="fc-btn" href="#">Find a local agent</a>
+        </div>
+        <div class="feature-card">
+          <div class="fc-illustration">
+            <svg viewBox="0 0 140 140" width="120" height="120" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="60" fill="#FFF3E0"/><rect x="52" y="42" width="36" height="55" rx="3" fill="#FF8A65"/><rect x="56" y="46" width="10" height="12" rx="1" fill="#fff" opacity="0.9"/><rect x="70" y="46" width="14" height="12" rx="1" fill="#fff" opacity="0.9"/><rect x="56" y="63" width="10" height="10" rx="1" fill="#fff" opacity="0.9"/><rect x="70" y="63" width="14" height="10" rx="1" fill="#fff" opacity="0.9"/><rect x="61" y="79" width="18" height="18" rx="2" fill="#D84315"/><rect x="44" y="60" width="10" height="37" rx="2" fill="#42A5F5"/><rect x="86" y="55" width="10" height="42" rx="2" fill="#66BB6A"/><ellipse cx="70" cy="97" rx="28" ry="5" fill="#A5D6A7" opacity="0.5"/></svg>
+          </div>
+          <h3 class="fc-title">Rent a home</h3>
+          <p class="fc-desc">We&rsquo;re creating a seamless online experience &ndash; from shopping on the largest rental network, to applying, to paying rent.</p>
+          <a class="fc-btn" href="#">Find rentals</a>
+        </div>
+        <div class="feature-card">
+          <div class="fc-illustration">
+            <svg viewBox="0 0 140 140" width="120" height="120" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="60" fill="#FFF8E1"/><rect x="40" y="62" width="44" height="38" rx="3" fill="#1565C0"/><polygon points="36,65 62,44 88,65" fill="#1976D2"/><rect x="56" y="76" width="12" height="24" rx="2" fill="#fff"/><rect x="94" y="46" width="6" height="54" rx="2" fill="#F57F17"/><rect x="88" y="46" width="18" height="6" rx="2" fill="#F57F17"/><rect x="104" y="44" width="4" height="8" rx="1" fill="#FFD600" transform="rotate(30 106 48)"/><rect x="44" y="68" width="10" height="10" rx="1" fill="#fff" opacity="0.8"/><rect x="70" y="68" width="10" height="10" rx="1" fill="#fff" opacity="0.8"/></svg>
+          </div>
+          <h3 class="fc-title">Sell a home</h3>
+          <p class="fc-desc">No matter what path you take to sell your home, we can help you navigate a successful sale.</p>
+          <a class="fc-btn" href="#">See your options</a>
+        </div>
+      </div>
+      <div class="about-recs">
+        <p class="about-recs-title">About Zillow&rsquo;s Recommendations</p>
+        <p class="about-recs-text">Recommendations are based on your location and search activity, such as the homes you&rsquo;ve viewed and saved and the filters you&rsquo;ve used. We use this information to bring similar homes to your attention, so you don&rsquo;t miss out.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── FEATURE CARDS SECTION ────────────────────────────── -->
+  <section class="feature-section">
+    <div class="feature-grid">
+      <div class="feature-card">
+        <img class="feature-illus"
+          src="https://www.zillowstatic.com/bedrock/app/uploads/sites/14/2023/06/buy-a-home.svg"
+          alt="Buy a home illustration"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+        />
+        <div style="display:none; width:110px; height:110px; background:#fff0e6; border-radius:50%; align-items:center; justify-content:center; margin-bottom:20px">
+          <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" fill="#e07000" stroke="#e07000" stroke-width="0.3"/><polyline points="9 22 9 12 15 12 15 22" fill="#fff"/></svg>
+        </div>
+        <h3>Buy a home</h3>
+        <p>A real estate agent can provide you with a clear breakdown of costs so that you can avoid surprise expenses.</p>
+        <a class="btn-feature" href="#">Find a local agent</a>
+      </div>
+      <div class="feature-card">
+        <img class="feature-illus"
+          src="https://www.zillowstatic.com/bedrock/app/uploads/sites/14/2023/06/rent-a-home.svg"
+          alt="Rent a home illustration"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+        />
+        <div style="display:none; width:110px; height:110px; background:#e6f0ff; border-radius:50%; align-items:center; justify-content:center; margin-bottom:20px">
+          <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="14" rx="1" fill="#006aff"/><path d="M8 21V13h8v8" fill="#fff"/><path d="M1 7l11-5 11 5" stroke="#006aff" stroke-width="2" fill="none"/></svg>
+        </div>
+        <h3>Rent a home</h3>
+        <p>We're creating a seamless online experience – from shopping on the largest rental network, to applying, to paying rent.</p>
+        <a class="btn-feature" href="#">Find rentals</a>
+      </div>
+      <div class="feature-card">
+        <img class="feature-illus"
+          src="https://www.zillowstatic.com/bedrock/app/uploads/sites/14/2023/06/sell-a-home.svg"
+          alt="Sell a home illustration"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+        />
+        <div style="display:none; width:110px; height:110px; background:#e6fff0; border-radius:50%; align-items:center; justify-content:center; margin-bottom:20px">
+          <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" fill="#008060" stroke="#008060" stroke-width="0.3"/><polyline points="9 22 9 12 15 12 15 22" fill="#fff"/></svg>
+        </div>
+        <h3>Sell a home</h3>
+        <p>No matter what path you take to sell your home, we can help you navigate a successful sale.</p>
+        <a class="btn-feature" href="#">See your options</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ABOUT ZILLOW'S RECOMMENDATIONS ───────────────────── -->
+  <div class="about-recs">
+    <h4>About Zillow's Recommendations</h4>
+    <p>Recommendations are based on your location and search activity, such as the homes you've viewed and saved and the filters you've used. We use this information to bring similar homes to your attention, so you don't miss out.</p>
+  </div>
+
+  <!-- ─── FOOTER ────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-nav">
+      <a class="footer-nav-item" href="#">Real Estate <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+      <a class="footer-nav-item" href="#">Rentals <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+      <a class="footer-nav-item" href="#">Mortgage Rates <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+      <a class="footer-nav-item" href="#">Browse Homes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-links-row">
+        <a href="#">About</a><a href="#">Zestimates</a><a href="#">News</a>
+        <a href="#">Research</a><a href="#">Careers</a><a href="#">Applicant Privacy Notice</a>
+        <a href="#">Help</a><a href="#">Advertise</a><a href="#">Fair Housing Guide</a>
+        <a href="#">Advocacy</a><a href="#">Terms of use</a><a href="#">Privacy Notice</a>
+        <a href="#">Ad Choices</a>
+      </div>
+      <div class="footer-links-row">
+        <a href="#">Cookie Preference</a><a href="#">Learn</a><a href="#">AI</a>
+        <a href="#">Mobile Apps</a>
+      </div>
+      <div class="footer-links-row">
+        <a href="#">Trulia</a><a href="#">StreetEasy</a><a href="#">HotPads</a>
+        <a href="#">Out East</a>
+      </div>
+      <a class="footer-donotsell" href="#">Do Not Sell or Share My Personal Information →</a>
+    </div>
+
+    <div class="footer-legal">
+      <p>Zillow Group is committed to ensuring digital accessibility for individuals with disabilities. We are continuously working to improve the accessibility of our web experience for everyone, and we welcome feedback and accommodation requests. If you wish to report an issue or seek an accommodation, please <a href="#">let us know</a>.</p>
+      <a class="legal-title" href="#">Affiliated Business Arrangement Disclosure</a>
+      <p>Zillow, Inc. holds real estate brokerage <a href="#">licenses</a> in multiple states. Zillow (Canada), Inc. holds real estate brokerage <a href="#">licenses</a> in multiple provinces.<br>
+      All mortgage lending products and information provided by Zillow Home Loans, LLC, NMLS #10287. <a href="#">NMLS Consumer Access</a><br>
+      Licensed Mortgage Banker, N.Y.S. Department of Financial Services<br>
+      2600 Michelson Drive, Suite 1201, Irvine, CA 92612 | Equal Housing Lender | <a href="#">Licensing information</a><br>
+      <a href="#">§ 442-H New York Standard Operating Procedures</a><br>
+      <a href="#">§ New York Fair Housing Notice</a></p>
+      <p style="margin-top:8px">TREC: <a href="#">Information about brokerage services</a>, <a href="#">Consumer protection notice</a><br>
+      California DRE #1522444</p>
+      <a class="legal-title" href="#" style="margin-top:12px">Contact Zillow, Inc. Brokerage</a>
+      <p>For listings in Canada, the trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA and identify the quality of services provided by real estate professionals who are members of CREA. Used under license.</p>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="app-buttons">
+        <a class="app-btn" href="#">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          <div class="app-btn-text"><small>Download on the</small><strong>App Store</strong></div>
+        </a>
+        <a class="app-btn" href="#">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.31.17.67.19 1.01.06l12.43-7.17-2.75-2.75-10.69 9.86zM.5 1.6C.18 1.94 0 2.44 0 3.07v17.86c0 .63.18 1.13.51 1.47l.08.07L10.12 12.5v-.22L.58 1.52.5 1.6zM20.25 10.7l-2.68-1.55-3.02 3.02 3.02 3.02 2.69-1.56c.77-.44.77-1.49-.01-1.93zM4.19.24L16.62 7.4l-2.75 2.75L3.18.29c.34-.13.7-.11 1.01-.05z"/></svg>
+          <div class="app-btn-text"><small>GET IT ON</small><strong>Google Play</strong></div>
+        </a>
+      </div>
+
+      <div class="footer-social">
+        <svg height="22" viewBox="0 0 120 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2L2 12h4v14h16V12h4L14 2z" fill="#006aff"/>
+          <text x="26" y="22" font-family="'Open Sans', Arial, sans-serif" font-weight="700" font-size="20" fill="#006aff">Zillow</text>
+        </svg>
+        <span>Follow us:</span>
+        <a class="social-icon fb" href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+        </a>
+        <a class="social-icon ig" href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="#fff" stroke-width="2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" fill="#fff"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </a>
+        <a class="social-icon tk" href="#" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
+        </a>
+        <span class="footer-copy">© 2006-2026 Zillow</span>
+        <svg class="equal-housing" viewBox="0 0 40 40" fill="none">
+          <rect width="40" height="40" rx="2" fill="#1a1a1a"/>
+          <path d="M20 8l-12 10h4v12h16V18h4L20 8z" fill="#fff"/>
+          <rect x="16" y="22" width="8" height="8" fill="#1a1a1a"/>
+          <text x="6" y="37" font-size="4.5" fill="#fff" font-family="'Open Sans', Arial, sans-serif" font-weight="700">EQUAL HOUSING</text>
+        </svg>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SITE FOOTER (v2) -->
+  <footer class="site-footer">
+    <div class="footer-nav">
+      <div class="footer-nav-inner">
+        <div class="footer-nav-item">
+          <button class="footer-nav-btn">Real Estate <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <ul class="footer-nav-dropdown"><li><a href="#">Homes for sale</a></li><li><a href="#">Foreclosures</a></li><li><a href="#">New construction</a></li><li><a href="#">Recently sold</a></li></ul>
+        </div>
+        <div class="footer-nav-sep"></div>
+        <div class="footer-nav-item">
+          <button class="footer-nav-btn">Rentals <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <ul class="footer-nav-dropdown"><li><a href="#">Apartments for rent</a></li><li><a href="#">Houses for rent</a></li><li><a href="#">All rental listings</a></li><li><a href="#">All rental buildings</a></li></ul>
+        </div>
+        <div class="footer-nav-sep"></div>
+        <div class="footer-nav-item">
+          <button class="footer-nav-btn">Mortgage Rates <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <ul class="footer-nav-dropdown"><li><a href="#">30-year fixed</a></li><li><a href="#">15-year fixed</a></li><li><a href="#">5/1 ARM</a></li><li><a href="#">7/1 ARM</a></li></ul>
+        </div>
+        <div class="footer-nav-sep"></div>
+        <div class="footer-nav-item">
+          <button class="footer-nav-btn">Browse Homes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <ul class="footer-nav-dropdown"><li><a href="#">Homes by state</a></li><li><a href="#">Homes by city</a></li><li><a href="#">Homes by zip</a></li></ul>
+        </div>
+      </div>
+    </div>
+    <hr class="footer-hr">
+    <div class="footer-links">
+      <div class="footer-links-row">
+        <a href="#">About</a><a href="#">Zestimates</a><a href="#">News</a><a href="#">Research</a><a href="#">Careers</a><a href="#">Applicant Privacy Notice</a><a href="#">Help</a><a href="#">Advertise</a><a href="#">Fair Housing Guide</a><a href="#">Advocacy</a><a href="#">Terms of use</a><a href="#">Privacy Notice</a><a href="#">Ad Choices</a>
+      </div>
+      <div class="footer-links-row">
+        <a href="#">Cookie Preference</a><a href="#">Learn</a><a href="#">AI</a><a href="#">Mobile Apps</a>
+      </div>
+      <div class="footer-links-row">
+        <a href="#">Trulia</a><a href="#">StreetEasy</a><a href="#">HotPads</a><a href="#">Out East</a>
+      </div>
+      <div class="footer-links-row" style="margin-top:8px;">
+        <a href="#" class="footer-link-blue">Do Not Sell or Share My Personal Information &rarr;</a>
+      </div>
+    </div>
+    <hr class="footer-hr">
+    <div class="footer-legal">
+      <p>Zillow Group is committed to ensuring digital accessibility for individuals with disabilities. We are continuously working to improve the accessibility of our web experience for everyone, and we welcome feedback and accommodation requests. If you wish to report an issue or seek an accommodation, please <a href="#">let us know</a>.</p>
+      <p><a href="#">Affiliated Business Arrangement Disclosure</a></p>
+      <p>Zillow, Inc. holds real estate brokerage <a href="#">licenses</a> in multiple states. Zillow (Canada), Inc. holds real estate brokerage <a href="#">licenses</a> in multiple provinces.<br>All mortgage lending products and information provided by Zillow Home Loans, LLC, NMLS #10287. <a href="#">NMLS Consumer Access</a><br>Licensed Mortgage Banker, N.Y.S. Department of Financial Services<br>2600 Michelson Drive, Suite 1201, Irvine, CA 92612 | Equal Housing Lender | <a href="#">Licensing information</a><br><a href="#">§ 442-H New York Standard Operating Procedures</a><br><a href="#">§ New York Fair Housing Notice</a><br>TREC: <a href="#">Information about brokerage services</a>, <a href="#">Consumer protection notice</a><br>California DRE #1522444</p>
+      <p><a href="#" class="footer-link-blue">Contact Zillow, Inc. Brokerage</a></p>
+      <p>For listings in Canada, the trademarks REALTOR&reg;, REALTORS&reg;, and the REALTOR&reg; logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS&reg;, Multiple Listing Service&reg; and the associated logos are owned by CREA and identify the quality of services provided by real estate professionals who are members of CREA. Used under license.</p>
+    </div>
+    <div class="footer-apps">
+      <a href="#" class="app-badge">
+        <svg viewBox="0 0 135 42" width="135" height="42" xmlns="http://www.w3.org/2000/svg"><rect width="135" height="42" rx="7" fill="#000"/><text x="38" y="15" fill="#fff" font-size="8" font-family="'Open Sans',Arial,sans-serif">Download on the</text><text x="33" y="30" fill="#fff" font-size="14" font-family="'Open Sans',Arial,sans-serif" font-weight="700">App Store</text></svg>
+      </a>
+      <a href="#" class="app-badge">
+        <svg viewBox="0 0 145 42" width="145" height="42" xmlns="http://www.w3.org/2000/svg"><rect width="145" height="42" rx="7" fill="#000"/><text x="38" y="15" fill="#fff" font-size="8" font-family="'Open Sans',Arial,sans-serif">GET IT ON</text><text x="33" y="30" fill="#fff" font-size="14" font-family="'Open Sans',Arial,sans-serif" font-weight="700">Google Play</text><polygon points="12,10 12,32 24,21" fill="#34A853" transform="translate(2,0)"/><polygon points="12,10 24,21 20,25" fill="#FBBC05" transform="translate(2,0)"/><polygon points="12,32 24,21 20,17" fill="#EA4335" transform="translate(2,0)"/><polygon points="14,10 14,32 12,31 12,11" fill="#4285F4" transform="translate(2,0)"/></svg>
+      </a>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <div class="footer-bottom-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#006aff"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          <span class="footer-zillow-name">Zillow</span>
+          <span class="footer-follow">Follow us:</span>
+          <a href="#" class="social-icon">
+            <svg viewBox="0 0 32 32" width="26" height="26" fill="#1877F2"><circle cx="16" cy="16" r="16" fill="#1877F2"/><path d="M21 16h-3v10h-4V16h-2v-4h2v-2c0-3 1.5-5 4-5h3v4h-2c-1 0-1 .5-1 1v2h3l-.5 4z" fill="#fff"/></svg>
+          </a>
+          <a href="#" class="social-icon">
+            <svg viewBox="0 0 32 32" width="26" height="26"><defs><radialGradient id="ig2" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect width="32" height="32" rx="7" fill="url(#ig2)"/><rect x="4" y="4" width="24" height="24" rx="5" stroke="#fff" stroke-width="2" fill="none"/><circle cx="16" cy="16" r="6" stroke="#fff" stroke-width="2" fill="none"/><circle cx="22.5" cy="9.5" r="1.5" fill="#fff"/></svg>
+          </a>
+          <a href="#" class="social-icon">
+            <svg viewBox="0 0 32 32" width="26" height="26"><rect width="32" height="32" rx="7" fill="#000"/><path d="M22.2 7.8a5.8 5.8 0 0 1-1.6-.2A5.3 5.3 0 0 0 19.5 7h-3.5v13.8a3.4 3.4 0 0 1-3.4 3.3 3.4 3.4 0 0 1-3.4-3.4c0-2.3 1.8-4 4-3.3V14a7.3 7.3 0 1 0 7.3 7.2V13.8a9 9 0 0 0 5.5 1.8v-3.4a5.4 5.4 0 0 1-3.8-2.4z" fill="#fff"/></svg>
+          </a>
+        </div>
+        <div class="footer-bottom-right">
+          <span>&copy; 2006-2026 Zillow.</span>
+          <svg viewBox="0 0 50 50" width="30" height="30" fill="none" stroke="#222" stroke-width="2">
+            <polygon points="25,5 45,20 45,45 5,45 5,20" fill="none"/>
+            <rect x="18" y="32" width="14" height="13" fill="#222" stroke="none"/>
+            <rect x="20" y="32" width="10" height="13" fill="#fff" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
